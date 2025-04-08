@@ -162,7 +162,7 @@ inicializar_sessao()
 st.sidebar.title("Simulador da Reforma Tributária")
 st.sidebar.image(
     "https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2022/dezembro/reforma-tributaria/art-reforma-jpg/@@images/image.jpeg",
-    use_column_width=True)
+    use_container_width=True=True)
 opcao_sidebar = st.sidebar.radio("Navegação", ["Simulação", "Configurações", "Memória de Cálculo", "Sobre"])
 
 # Conteúdo principal
