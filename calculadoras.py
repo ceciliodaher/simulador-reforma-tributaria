@@ -338,59 +338,59 @@ class CalculadoraTributosAtuais:
 
                 credito_total += credito_incentivado
 
-            # Processar incentivos de apuração (aplicados sobre o saldo devedor)
-            incentivos_apuracao = self.config.icms_config.get("incentivos_apuracao", [])
-            icms_antes_incentivos_apuracao = max(0, debito_total - credito_total)
+                # Processar incentivos de apuração (aplicados sobre o saldo devedor)
+                incentivos_apuracao = self.config.icms_config.get("incentivos_apuracao", [])
+                icms_antes_incentivos_apuracao = max(0, debito_total - credito_total)
 
-            memoria_calculo.append(f"\n== Processando incentivos de apuração do ICMS ==")
-            memoria_calculo.append(
-                f"ICMS antes dos incentivos de apuração: R$ {formatar_br(icms_antes_incentivos_apuracao)}")
+                memoria_calculo.append(f"\n== Processando incentivos de apuração do ICMS ==")
+                memoria_calculo.append(
+                    f"ICMS antes dos incentivos de apuração: R$ {formatar_br(icms_antes_incentivos_apuracao)}")
 
-            # Se não há saldo devedor ou incentivos de apuração, não aplicar
-            if icms_antes_incentivos_apuracao <= 0 or not incentivos_apuracao:
-                memoria_calculo.append(f"Não há saldo devedor ou incentivos de apuração configurados.")
-                icms_devido = icms_antes_incentivos_apuracao
-            else:
-                reducao_total = 0
+                # Se não há saldo devedor ou incentivos de apuração, não aplicar
+                if icms_antes_incentivos_apuracao <= 0 or not incentivos_apuracao:
+                    memoria_calculo.append(f"Não há saldo devedor ou incentivos de apuração configurados.")
+                    icms_devido = icms_antes_incentivos_apuracao
+                else:
+                    reducao_total = 0
 
-                for idx, incentivo in enumerate(incentivos_apuracao, 1):
-                    tipo = incentivo.get("tipo", "Nenhum")
-                    percentual = incentivo.get("percentual", 0.0)
-                    percentual_saldo = incentivo.get("percentual_operacoes", 1.0)  # Percentual do saldo
-                    descricao = incentivo.get("descricao", f"Incentivo Apuração {idx}")
+                    for idx, incentivo in enumerate(incentivos_apuracao, 1):
+                        tipo = incentivo.get("tipo", "Nenhum")
+                        percentual = incentivo.get("percentual", 0.0)
+                        percentual_saldo = incentivo.get("percentual_operacoes", 1.0)  # Percentual do saldo
+                        descricao = incentivo.get("descricao", f"Incentivo Apuração {idx}")
 
-                    if tipo == "Nenhum" or percentual <= 0:
-                        continue
+                        if tipo == "Nenhum" or percentual <= 0:
+                            continue
 
-                    saldo_afetado = icms_antes_incentivos_apuracao * percentual_saldo
+                        saldo_afetado = icms_antes_incentivos_apuracao * percentual_saldo
 
-                    memoria_calculo.append(f"\nIncentivo de apuração {idx}: {descricao}")
-                    memoria_calculo.append(f"Tipo: {tipo}")
-                    memoria_calculo.append(f"Percentual do incentivo: {formatar_br(percentual * 100)}%")
-                    memoria_calculo.append(f"Percentual do saldo: {formatar_br(percentual_saldo * 100)}%")
-                    memoria_calculo.append(f"Saldo afetado: R$ {formatar_br(saldo_afetado)}")
+                        memoria_calculo.append(f"\nIncentivo de apuração {idx}: {descricao}")
+                        memoria_calculo.append(f"Tipo: {tipo}")
+                        memoria_calculo.append(f"Percentual do incentivo: {formatar_br(percentual * 100)}%")
+                        memoria_calculo.append(f"Percentual do saldo: {formatar_br(percentual_saldo * 100)}%")
+                        memoria_calculo.append(f"Saldo afetado: R$ {formatar_br(saldo_afetado)}")
 
-                    if tipo == "Crédito Presumido/Outorgado":
-                        reducao = saldo_afetado * percentual
-                        memoria_calculo.append(
-                            f"Crédito outorgado: R$ {formatar_br(saldo_afetado)} × {formatar_br(percentual * 100)}% = R$ {formatar_br(reducao)}")
+                        if tipo == "Crédito Presumido/Outorgado":
+                            reducao = saldo_afetado * percentual
+                            memoria_calculo.append(
+                                f"Crédito outorgado: R$ {formatar_br(saldo_afetado)} × {formatar_br(percentual * 100)}% = R$ {formatar_br(reducao)}")
 
-                    elif tipo == "Redução do Saldo Devedor":
-                        reducao = saldo_afetado * percentual
-                        memoria_calculo.append(
-                            f"Redução direta: R$ {formatar_br(saldo_afetado)} × {formatar_br(percentual * 100)}% = R$ {formatar_br(reducao)}")
+                        elif tipo == "Redução do Saldo Devedor":
+                            reducao = saldo_afetado * percentual
+                            memoria_calculo.append(
+                                f"Redução direta: R$ {formatar_br(saldo_afetado)} × {formatar_br(percentual * 100)}% = R$ {formatar_br(reducao)}")
 
-                    else:
-                        reducao = 0
-                        memoria_calculo.append(f"Tipo de incentivo não implementado para apuração")
+                        else:
+                            reducao = 0
+                            memoria_calculo.append(f"Tipo de incentivo não implementado para apuração")
 
-                    reducao_total += reducao
+                        reducao_total += reducao
 
-                # Aplicar reduções
-                icms_devido = max(0, icms_antes_incentivos_apuracao - reducao_total)
+                    # Aplicar reduções
+                    icms_devido = max(0, icms_antes_incentivos_apuracao - reducao_total)
 
-                memoria_calculo.append(f"\nTotal de reduções de apuração: R$ {formatar_br(reducao_total)}")
-                memoria_calculo.append(f"ICMS devido após incentivos de apuração: R$ {formatar_br(icms_devido)}")
+                    memoria_calculo.append(f"\nTotal de reduções de apuração: R$ {formatar_br(reducao_total)}")
+                    memoria_calculo.append(f"ICMS devido após incentivos de apuração: R$ {formatar_br(icms_devido)}")
 
             # Adicionar crédito das operações não incentivadas
             if custos_nao_incentivados > 0:
