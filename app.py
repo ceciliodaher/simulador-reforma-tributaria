@@ -269,7 +269,8 @@ if opcao_sidebar == "Simulação":
                     perc_saida = st.number_input("Percentual do Incentivo (%)", min_value=0.0, max_value=100.0,
                                                  value=0.0, step=1.0, key="perc_saida")
                     oper_saida = st.number_input("Percentual de Operações (%)", min_value=0.0, max_value=100.0,
-                                                 value=100.0, step=1.0, key="oper_saida")adicionar_saida = st.form_submit_button("Adicionar")
+                                                 value=100.0, step=1.0, key="oper_saida")
+                  adicionar_saida = st.form_submit_button("Adicionar")
 
                 if adicionar_saida:
                     dados_incentivo = {
